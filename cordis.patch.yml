@@ -1,0 +1,63 @@
+# PaperReader bundle patch: the host half, plus the Agent preset every paper
+# session runs under.
+#
+# The translator row mounts the harness' anonymous machine-translation service
+# (Bing/Google) so the experimental "在线机器翻译" source works without an API
+# key. It is inserted before the paper plugin row so the lazy `ctx.get('translator')`
+# handoff in the host half resolves.
+#
+# The preset is declared here rather than created at runtime so it exists before
+# the first session is created; re-enabling the plugin re-applies this row.
+#
+# `paper-reader` is deliberately empty apart from a persona and its own
+# compaction: the Web profile disables every agent-plane row (tools, skills,
+# plan, subagents) and lets each preset mount what it needs, so this preset
+# gives the model no tools at all.
+#
+#   persona   the system prompt, static bytes -> the provider can cache the prefix
+#   compaction  `compaction` is per-preset in the Web profile; without this row
+#               a paper session would never compact and `POST /compact` would
+#               have no service to call.
+#
+# Keep `prefix` byte-identical to PAPER_PERSONA in src/host/ai/persona.ts;
+# scripts/test-chat.mjs asserts that they match.
+- insert:
+    - id: dsh-paper-read-translator
+      name: '@deepseek-ai/dsh-experimental-translator'
+      config:
+        provider: bing
+
+    - id: dsh-paper-read
+      name: dsh-paper-read
+
+    - id: preset-paper-reader
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: paper-reader
+        name: 论文助手
+        description: 阅读论文时的对话助手：无工具、无 skill、无 plan
+        order: 40
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |-
+                You are the reading assistant inside a paper reader. You read one paper together with the reader.
+
+                Answer rules:
+                - Be brief. Stay under 180 words by default; use bullets when expanding and do not add headings.
+                - Answer only from the paper material supplied in the conversation (fixed digest, quoted excerpts). If the material does not contain it, say so and name the section to check.
+                - Cite the page after each conclusion, in the form: page N.
+                - Do not restate the question; do not open with phrases like "this passage means".
+                - For formulas, explain what each symbol does and point out key derivations the authors left implicit.
+                - Answer in Simplified Chinese; keep proper nouns, symbols and technical terms in their original form.
+              complete: true
+              includeRuntimeContext: false
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'

@@ -1,0 +1,5 @@
+# pnpm 11 起，构建脚本白名单等设置从 package.json 的 pnpm 字段迁到这里，
+# 且改用 allowBuilds 映射。esbuild 的 postinstall 只做二进制校验，
+# 但被默认拦截会让安装报 ERR_PNPM_IGNORED_BUILDS。
+allowBuilds:
+  esbuild: true

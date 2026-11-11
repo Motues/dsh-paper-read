@@ -1,0 +1,101 @@
+{
+  "name": "dsh-paper-read",
+  "version": "0.1.0",
+  "description": "论文管理与阅读：保真阅读器、边注式 AI 助手、跨论文记忆检索。",
+  "icon": "icon.svg",
+  "type": "module",
+  "packageManager": "pnpm@11.21.0",
+  "main": "./dist/host/index.js",
+  "exports": {
+    ".": "./dist/host/index.js",
+    "./client": "./dist/client/client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "paper",
+    "pdf",
+    "reading",
+    "annotation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Motues/dsh-paper-read.git"
+  },
+  "homepage": "https://github.com/Motues/dsh-paper-read#readme",
+  "author": "Motues (https://github.com/Motues)",
+  "bugs": {
+    "url": "https://github.com/Motues/dsh-paper-read/issues"
+  },
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "pnpm run clean && pnpm run build:host && pnpm run build:client",
+    "build:host": "tsc -p tsconfig.build.json",
+    "build:client": "node build/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run typecheck && pnpm run build && pnpm run test:metadata && pnpm run test:selection && pnpm run test:store && pnpm run test:library && pnpm run test:search && pnpm run test:ai && pnpm run test:relations && pnpm run test:chat && pnpm run test:translation && pnpm run test:translation-sources && pnpm run test:translation-routes && pnpm run test:typeset && pnpm run test:math && pnpm run test:render && pnpm run test:pdf && pnpm run test:reader && pnpm run test:workspace && pnpm run test:usage && pnpm run test:tasks && pnpm run test:summary && pnpm run test:summary-api",
+    "test:metadata": "node scripts/test-metadata.mjs",
+    "test:selection": "node scripts/test-selection.mjs",
+    "test:store": "node scripts/test-store.mjs",
+    "test:library": "node scripts/test-library-api.mjs",
+    "test:search": "node scripts/test-search.mjs",
+    "test:ai": "node scripts/test-ai-switch.mjs",
+    "test:relations": "node scripts/test-relations.mjs",
+    "test:chat": "node scripts/test-chat.mjs",
+    "test:translation": "node scripts/test-translation.mjs",
+    "test:translation-sources": "node scripts/test-translation-sources.mjs",
+    "test:translation-routes": "node scripts/test-translation-routes.mjs",
+    "test:render": "node scripts/smoke-render.mjs",
+    "test:pdf": "node scripts/test-pdf-render.mjs",
+    "test:reader": "node scripts/test-reader-zoom.mjs",
+    "test:workspace": "node scripts/test-reader-workspace.mjs",
+    "test:usage": "node scripts/test-usage.mjs",
+    "test:tasks": "node scripts/test-tasks.mjs",
+    "test:summary": "node scripts/test-summary.mjs",
+    "test:summary-api": "node scripts/test-summary-api.mjs",
+    "test:api": "node scripts/test-api.mjs",
+    "prepack": "pnpm run build",
+    "test:typeset": "node scripts/test-typeset.mjs",
+    "test:math": "node scripts/test-math.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "dependencies": {
+    "d3-force": "^3.0.1",
+    "katex": "^0.16.22",
+    "motion": "^14.10.0",
+    "pdfjs-dist": "^4.10.38"
+  },
+  "devDependencies": {
+    "@types/d3-force": "^3.0.10",
+    "@types/node": "^24.19.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "esbuild": "^0.25.12",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.2"
+  }
+}
